@@ -2,6 +2,9 @@
    LetsGrowPatients.com — Main JavaScript
    ============================================ */
 
+// Cloudflare Worker endpoint for form submissions
+const WORKER_URL = 'https://kb-leads-proxy.bryan-boutin.workers.dev';
+
 document.addEventListener('DOMContentLoaded', () => {
 
   // ---- Navbar scroll effect ----
@@ -125,7 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // ---- Contact form submission ----
   const contactForm = document.getElementById('contactForm');
   if (contactForm) {
-    contactForm.addEventListener('submit', (e) => {
+    contactForm.addEventListener('submit', async (e) => {
       e.preventDefault();
 
       const submitBtn = contactForm.querySelector('button[type="submit"]');
@@ -134,8 +137,33 @@ document.addEventListener('DOMContentLoaded', () => {
       submitBtn.innerHTML = '<span style="display:inline-flex;align-items:center;gap:8px;">Sending... <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="spin"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 10 10"/></svg></span>';
       submitBtn.disabled = true;
 
-      // Simulate form submission
-      setTimeout(() => {
+      try {
+        // Collect form data
+        const data = {
+          name: contactForm.querySelector('[name="name"]')?.value,
+          email: contactForm.querySelector('[name="email"]')?.value,
+          phone: contactForm.querySelector('[name="phone"]')?.value,
+          company: contactForm.querySelector('[name="practiceName"]')?.value || '',
+          websiteUrl: contactForm.querySelector('[name="website"]')?.value || '',
+          industry: contactForm.querySelector('[name="location"]')?.value || '',
+          message: contactForm.querySelector('[name="message"]')?.value || '',
+          source: 'LetsGrowPatients.com',
+          entryPoint: 'Contact Form',
+        };
+
+        // POST to Cloudflare Worker
+        const response = await fetch(WORKER_URL + '/lead', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to submit form');
+        }
+
         submitBtn.innerHTML = '✓ Audit Request Received!';
         submitBtn.style.background = 'linear-gradient(135deg, #059669, #10b981)';
 
@@ -145,9 +173,133 @@ document.addEventListener('DOMContentLoaded', () => {
           submitBtn.disabled = false;
           contactForm.reset();
         }, 3000);
-      }, 1500);
+      } catch (error) {
+        console.error('Form submission error:', error);
+        submitBtn.innerHTML = '✗ Submission Failed';
+        submitBtn.style.background = 'linear-gradient(135deg, #dc2626, #ef4444)';
+
+        setTimeout(() => {
+          submitBtn.innerHTML = originalText;
+          submitBtn.style.background = '';
+          submitBtn.disabled = false;
+        }, 3000);
+      }
     });
   }
+
+  // ---- Quick Contact form submission ----
+  const quickContactForm = document.getElementById('quickContact');
+  if (quickContactForm) {
+    quickContactForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const submitBtn = quickContactForm.querySelector('button[type="submit"]');
+      const originalText = submitBtn.innerHTML;
+
+      submitBtn.innerHTML = '<span style="display:inline-flex;align-items:center;gap:8px;">Sending... <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="spin"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 10 10"/></svg></span>';
+      submitBtn.disabled = true;
+
+      try {
+        // Collect form data
+        const data = {
+          name: quickContactForm.querySelector('[name="name"]')?.value,
+          email: quickContactForm.querySelector('[name="email"]')?.value,
+          phone: quickContactForm.querySelector('[name="phone"]')?.value,
+          message: quickContactForm.querySelector('[name="message"]')?.value || '',
+          source: 'LetsGrowPatients.com',
+          entryPoint: 'Quick Message',
+        };
+
+        // POST to Cloudflare Worker
+        const response = await fetch(WORKER_URL + '/lead', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to submit form');
+        }
+
+        submitBtn.innerHTML = '✓ Message Sent!';
+        submitBtn.style.background = 'linear-gradient(135deg, #059669, #10b981)';
+
+        setTimeout(() => {
+          submitBtn.innerHTML = originalText;
+          submitBtn.style.background = '';
+          submitBtn.disabled = false;
+          quickContactForm.reset();
+        }, 3000);
+      } catch (error) {
+        console.error('Form submission error:', error);
+        submitBtn.innerHTML = '✗ Submission Failed';
+        submitBtn.style.background = 'linear-gradient(135deg, #dc2626, #ef4444)';
+
+        setTimeout(() => {
+          submitBtn.innerHTML = originalText;
+          submitBtn.style.background = '';
+          submitBtn.disabled = false;
+        }, 3000);
+      }
+    });
+  }
+
+  // ---- Newsletter form submission ----
+  const newsletterForms = document.querySelectorAll('#newsletterForm');
+  newsletterForms.forEach(form => {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const submitBtn = form.querySelector('button[type="submit"]');
+      const originalText = submitBtn.innerHTML;
+
+      submitBtn.innerHTML = 'Subscribing...';
+      submitBtn.disabled = true;
+
+      try {
+        // Collect form data
+        const data = {
+          email: form.querySelector('[type="email"]')?.value,
+          source: 'LetsGrowPatients.com - Newsletter',
+        };
+
+        // POST to Cloudflare Worker
+        const response = await fetch(WORKER_URL + '/newsletter', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to submit form');
+        }
+
+        submitBtn.innerHTML = '✓ Subscribed!';
+        submitBtn.style.background = 'linear-gradient(135deg, #059669, #10b981)';
+
+        setTimeout(() => {
+          submitBtn.innerHTML = originalText;
+          submitBtn.style.background = '';
+          submitBtn.disabled = false;
+          form.reset();
+        }, 3000);
+      } catch (error) {
+        console.error('Form submission error:', error);
+        submitBtn.innerHTML = '✗ Subscription Failed';
+        submitBtn.style.background = 'linear-gradient(135deg, #dc2626, #ef4444)';
+
+        setTimeout(() => {
+          submitBtn.innerHTML = originalText;
+          submitBtn.style.background = '';
+          submitBtn.disabled = false;
+        }, 3000);
+      }
+    });
+  });
 
   // ---- Smooth scroll for anchor links ----
   document.querySelectorAll('a[href^="#"]').forEach(anchor => {
