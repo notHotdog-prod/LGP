@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 120" fill="none">
+  <defs>
+    <linearGradient id="grad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#6b21a8"/>
+      <stop offset="50%" stop-color="#7c3aed"/>
+      <stop offset="100%" stop-color="#a855f7"/>
+    </linearGradient>
+  </defs>
+  <circle cx="60" cy="60" r="46" stroke="url(#grad)" stroke-width="4" fill="none"/>
+  <line x1="42" y1="78" x2="88" y2="22" stroke="url(#grad)" stroke-width="4" stroke-linecap="round"/>
+  <polyline points="72,20 90,20 90,38" stroke="url(#grad)" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="36" y="68" font-family="'Plus Jakarta Sans', 'Inter', sans-serif" font-size="24" font-weight="700" fill="url(#grad)">grow.</text>
+  <text x="122" y="42" font-family="'Plus Jakarta Sans', 'Inter', sans-serif" font-size="28" font-weight="300" fill="#6b21a8">lets</text>
+  <text x="122" y="72" font-family="'Plus Jakarta Sans', 'Inter', sans-serif" font-size="28" font-weight="300" fill="#6b21a8">grow</text>
+  <text x="122" y="102" font-family="'Plus Jakarta Sans', 'Inter', sans-serif" font-size="28" font-weight="800" fill="#1a0a2e">patients.com</text>
+</svg>
